@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F4F0E9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1224" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Motor Yıkama">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>Motor Yıkama Rehberi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* direction: marker-sketch mood. paper ground, ink lines, blue accent, peach and sand colour blocks. layout: two views. 1) photo grid of gear, one button. 2) one step per screen: drawing, title, photos, three lines, one warning, one button */
+  --bg:#F4F0E9; --stage:#EFE6D6; --surface:#FFFFFF; --ink:#131C36; --muted:#5B6479; --line:#D9D2C6;
+  --water:#1B5CD6; --water-soft:#D6E3FA; --on-water:#FFFFFF;
+  --warn:#A2400C; --warn-bg:#FBE3D3; --iron:#7A3FB0; --ok:#17775A;
+  --bike:#131C36; --metal:#8793A8; --tire:#0E1528; --foam:#FFFFFF;
+  --shard-a:#F3B595; --shard-b:#EBCF9B; --shard-c:#B9CDEC;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0C1224; --stage:#141C33; --surface:#18213A; --ink:#EEF1F8; --muted:#9AA5BF; --line:#2A3553;
+    --water:#6FA2FF; --water-soft:#1A2B55; --on-water:#07122B;
+    --warn:#F6B08C; --warn-bg:#3B2416; --iron:#B98BE8; --ok:#5ED0A7;
+    --bike:#E3E8F4; --metal:#7C89A6; --tire:#B4BED6; --foam:#F4F6FB;
+    --shard-a:#5A3324; --shard-b:#4A3E22; --shard-c:#1E3463;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0C1224; --stage:#141C33; --surface:#18213A; --ink:#EEF1F8; --muted:#9AA5BF; --line:#2A3553;
+    --water:#6FA2FF; --water-soft:#1A2B55; --on-water:#07122B;
+    --warn:#F6B08C; --warn-bg:#3B2416; --iron:#B98BE8; --ok:#5ED0A7;
+    --bike:#E3E8F4; --metal:#7C89A6; --tire:#B4BED6; --foam:#F4F6FB;
+    --shard-a:#5A3324; --shard-b:#4A3E22; --shard-c:#1E3463;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-text-size-adjust:100%}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+h1{margin:0;font:italic 700 38px/1 var(--display);text-wrap:balance}
+
+.app{height:100%;max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.view{height:100%;display:none;flex-direction:column}
+.app[data-view="list"] .list,.app[data-view="step"] .step{display:flex}
+.foot{padding:10px 16px 16px;flex-shrink:0}
+.go{width:100%;padding:17px 12px;border:0;border-radius:14px;background:var(--water);color:var(--on-water);font:italic 700 24px/1 var(--display);letter-spacing:.02em}
+
+/* gear view */
+.lhead{padding:18px 16px 12px;display:grid;gap:6px}
+.lhead p{margin:0;font-size:16px;color:var(--muted)}
+.lhead::after{content:"";width:104px;height:7px;border-radius:2px;transform:skewX(-18deg);background:linear-gradient(90deg,var(--shard-a) 0 34%,var(--shard-b) 34% 67%,var(--water) 67%)}
+.grid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px;padding:2px 16px 12px;align-content:start}
+.tile{display:grid;gap:6px;align-content:start;justify-items:center;padding:0;border:0;background:none;text-align:center;font:500 13px/1.2 var(--body);color:var(--ink)}
+.pic{position:relative;width:100%;aspect-ratio:1;display:grid;place-items:center;background:#FFFFFF;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:contain;padding:8px}
+.pic svg{width:68%;height:68%;fill:none;stroke:#131C36;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.buy{position:absolute;left:6px;top:6px;padding:2px 7px;border-radius:999px;background:#FBE8D4;color:#A14606;font:600 11px var(--body)}
+.tick{position:absolute;right:6px;bottom:6px;width:24px;height:24px;border-radius:50%;background:#17775A;display:none;place-items:center}
+.tick svg{width:14px;height:14px;stroke:#FFFFFF;stroke-width:3.5}
+.tile[aria-pressed="true"] .pic{border-color:var(--ok);box-shadow:0 0 0 2px var(--ok)}
+.tile[aria-pressed="true"] .tick{display:grid}
+
+/* step view */
+.bar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;padding:10px 16px 8px;flex-shrink:0}
+.back{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.count{margin:0;text-align:center;font:600 16px var(--body);font-variant-numeric:tabular-nums}
+.prog{height:6px;margin:0 16px 12px;border-radius:3px;background:var(--line);overflow:hidden;flex-shrink:0}
+.prog i{display:block;height:100%;width:10%;border-radius:3px;background:var(--water);transition:width .3s ease}
+.stage{margin:0 16px;background:#F3EFE8;border-radius:14px;overflow:hidden;flex-shrink:0;
+  --ink:#131C36;--surface:#FFFFFF;--line:#D9D2C6;--water:#1B5CD6;--water-soft:#D6E3FA;--warn:#B84A0E;--iron:#8A3FC8;--ok:#128A63;--foam:#FFFFFF;--metal:#8793A8;--mark:#0A9A96}
+.stage svg{display:block;width:100%;height:auto;max-height:205px}
+@media (max-height:760px){.stage svg{max-height:150px}}
+.body{flex:1;min-height:0;overflow-y:auto;padding:12px 16px 6px;display:flex;flex-direction:column;gap:12px}
+.body h1{font-size:34px}
+.use{display:flex;gap:10px}
+.use .tile{width:80px;font-size:12px;overflow-wrap:anywhere}
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:n;font:500 18px/1.3 var(--body)}
+.todo li{counter-increment:n;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.todo li::before{content:counter(n);width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font:700 17px/28px var(--display);text-align:center}
+.timer{padding:13px 12px;border:2px dashed var(--water);border-radius:12px;background:none;font:600 17px var(--body);font-variant-numeric:tabular-nums}
+.timer.run{border-style:solid}
+.timer.over{border-style:solid;background:var(--water);color:var(--on-water)}
+.warn{margin:0;padding:10px 12px;display:flex;gap:9px;align-items:flex-start;background:var(--warn-bg);color:var(--warn);border-radius:10px;font:500 16px/1.35 var(--body)}
+.warn::before{content:"!";flex:0 0 20px;height:20px;margin-top:1px;border-radius:50%;border:2px solid currentColor;font:700 13px/16px var(--body);text-align:center}
+[hidden]{display:none!important}
+
+/* drawing */
+.cap{font:600 14px var(--body);fill:var(--ink)}
+.num{font:700 13px var(--display);fill:var(--surface)}
+.big{font:700 26px var(--display);fill:var(--ink)}
+.ring{fill:none;stroke:var(--warn);stroke-width:2.5;stroke-dasharray:5 3}
+.slash{stroke:var(--warn);stroke-width:2.5;stroke-linecap:round}
+.hl{fill:var(--mark);fill-opacity:.22;stroke:var(--mark);stroke-width:3}
+.halo{fill:none;stroke:#FFFFFF;stroke-width:6;opacity:.85}
+.blob{fill:var(--foam);stroke:#B9C2D3;stroke-width:1.5;transform-box:fill-box;transform-origin:center}
+.iron{fill:var(--iron);opacity:.7}
+.dropdot{fill:var(--water)}
+.mitt{transform:translate(200px,74px)}
+.towel{transform:translate(200px,74px)}
+.cloth{transform:translate(100px,90px)}
+.water-level{transform-box:fill-box;transform-origin:bottom}
+.puff{transform-box:fill-box;transform-origin:center}
+.fx{display:none}
+.app[data-step="1"] .fx-1,.app[data-step="2"] .fx-2,.app[data-step="3"] .fx-3,.app[data-step="4"] .fx-4,.app[data-step="5"] .fx-5,
+.app[data-step="6"] .fx-6,.app[data-step="7"] .fx-7,.app[data-step="8"] .fx-8,.app[data-step="9"] .fx-9,.app[data-step="10"] .fx-10{display:block}
+.app[data-step="4"] #bike,.app[data-step="4"] .cap-base{opacity:.14}
+.app[data-step="8"] .cap-base,.app[data-step="9"] .cap-base,.app[data-step="10"] .cap-base{display:none}
+
+@media (prefers-reduced-motion: no-preference){
+  .pulse{animation:pulse 1.4s ease-in-out infinite}
+  .band{animation:sweep 2.6s linear infinite}
+  .drop{animation:fall 1s linear infinite}
+  .ring,.slash{animation:pulse 1.2s ease-in-out infinite}
+  .iron{animation:react 2.4s ease-in-out infinite alternate}
+  .brush{animation:scrub .7s ease-in-out infinite alternate}
+  .water-level{animation:fillup 3.2s ease-in-out infinite}
+  .stream{animation:flow .5s linear infinite}
+  .fx-5 .blob{animation:pop .5s cubic-bezier(.3,1.5,.6,1) both}
+  .fx-7 .blob{animation:washoff .5s linear both}
+  .mitt{animation:wipe 8s ease-in-out infinite}
+  .towel{animation:dry 8s ease-in-out infinite}
+  .fx-8 .dropdot{animation:washoff .4s linear both}
+  .cap-off{animation:capoff .9s ease-in 1s both}
+  .hl{animation:pulse 1.3s ease-in-out infinite}
+  .cloth{animation:polish 1.6s ease-in-out infinite alternate}
+  .puff{animation:puff 1.6s ease-out infinite}
+  .app[data-step="10"] #bike{animation:idle .12s linear infinite alternate}
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes sweep{from{transform:translateY(0)}to{transform:translateY(172px)}}
+@keyframes fall{from{transform:translateY(-6px);opacity:0}30%{opacity:1}to{transform:translateY(16px);opacity:0}}
+@keyframes react{from{opacity:.12}to{opacity:.8}}
+@keyframes scrub{from{transform:translateY(-7px)}to{transform:translateY(9px)}}
+@keyframes fillup{0%{transform:scaleY(.12)}70%,100%{transform:scaleY(1)}}
+@keyframes flow{to{stroke-dashoffset:-12}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes washoff{from{opacity:1}to{opacity:0}}
+@keyframes wipe{
+  0%{transform:translate(262px,48px)}10%{transform:translate(200px,74px)}20%{transform:translate(240px,72px)}30%{transform:translate(180px,84px)}
+  42%{transform:translate(140px,92px)}52%{transform:translate(70px,92px)}62%{transform:translate(120px,96px)}
+  74%{transform:translate(160px,132px)}84%{transform:translate(206px,146px)}94%{transform:translate(130px,160px)}100%{transform:translate(262px,48px)}
+}
+@keyframes dry{0%{transform:translate(200px,74px)}22%{transform:translate(100px,90px)}45%{transform:translate(170px,134px)}68%{transform:translate(67px,164px)}90%{transform:translate(287px,161px)}100%{transform:translate(200px,74px)}}
+@keyframes capoff{to{transform:translate(-30px,-6px);opacity:0}}
+@keyframes polish{from{transform:translate(66px,88px)}to{transform:translate(140px,94px)}}
+@keyframes puff{from{transform:translate(0,0) scale(.6);opacity:.7}to{transform:translate(-26px,-10px) scale(2);opacity:0}}
+@keyframes idle{to{transform:translateY(.8px)}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-mitt" viewBox="0 0 64 64"><rect x="20" y="10" width="28" height="36" rx="13"/><rect x="10" y="26" width="14" height="18" rx="7"/><path d="M22 46V56H46V46M22 51H46"/></symbol>
+  <symbol id="i-towel" viewBox="0 0 64 64"><rect x="10" y="16" width="44" height="32" rx="5"/><path d="M10 26H54M18 36H46M18 42H38"/></symbol>
+  <symbol id="i-bucket" viewBox="0 0 64 64"><path d="M14 24H50L45 54H19Z"/><path d="M14 24C14 6 50 6 50 24"/><path d="M19 34H45"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 64 64"><path d="M22 22C12 30 12 54 32 54C52 54 52 30 42 22"/><path d="M22 22H42M26 22L22 12M38 22L42 12M32 22V14"/></symbol>
+  <symbol id="i-washer" viewBox="0 0 64 64"><path d="M24 16V8H40V16"/><rect x="16" y="16" width="30" height="36" rx="7"/><rect x="24" y="24" width="14" height="18" rx="3"/><circle cx="46" cy="52" r="6"/></symbol>
+  <symbol id="i-lance" viewBox="0 0 64 64"><path d="M12 54L18 42L44 16"/><path d="M19 41L27 46"/><path d="M48 14L58 9M47 11L54 4M50 17L59 17"/></symbol>
+  <symbol id="i-foam" viewBox="0 0 64 64"><rect x="20" y="34" width="22" height="22" rx="5"/><path d="M31 34V26M10 26H44L52 21"/><circle cx="55" cy="12" r="3"/><circle cx="46" cy="11" r="2"/><circle cx="58" cy="23" r="2"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 64 64"><rect x="8" y="22" width="48" height="26" rx="5"/><path d="M22 22V16H42V22"/><path d="M35 27L28 36H36L29 44"/></symbol>
+  <symbol id="i-jug" viewBox="0 0 64 64"><path d="M24 10H36V18L46 26V54H18V26L24 18Z"/><path d="M24 15H36"/><circle cx="32" cy="39" r="7"/></symbol>
+  <symbol id="i-spray-wheel" viewBox="0 0 64 64"><rect x="20" y="28" width="22" height="28" rx="5"/><path d="M26 28V20H36V28"/><path d="M24 20H44V12H30Z"/><path d="M44 16H53"/><circle cx="31" cy="42" r="6"/><circle cx="31" cy="42" r="1"/></symbol>
+  <symbol id="i-spray-trim" viewBox="0 0 64 64"><rect x="20" y="28" width="22" height="28" rx="5"/><path d="M26 28V20H36V28"/><path d="M24 20H44V12H30Z"/><path d="M44 16H53"/><path d="M26 38H36M26 44H36M26 50H32"/></symbol>
+  <symbol id="i-wheelbrush" viewBox="0 0 64 64"><path d="M32 6V24"/><rect x="22" y="24" width="20" height="34" rx="10"/><path d="M22 32H17M22 40H17M22 48H17M42 32H47M42 40H47M42 48H47"/></symbol>
+  <symbol id="i-handbrush" viewBox="0 0 64 64"><path d="M8 34C8 16 56 16 56 34Z"/><path d="M13 34V44M21 34V46M29 34V46M37 34V46M45 34V46M52 34V44"/></symbol>
+  <symbol id="i-cloth" viewBox="0 0 64 64"><path d="M10 28L38 12L54 38L26 54Z"/><path d="M26 54L31 37L54 38"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app" id="app" data-view="list" data-step="1">
+
+  <section class="view list" aria-label="Malzemeler">
+    <header class="lhead">
+      <h1>Malzemeleri topla</h1>
+      <p>Hazır olana dokun. Hepsi yanındaysa başla.</p>
+    </header>
+    <div class="grid" id="grid"></div>
+    <footer class="foot"><button class="go" id="start" type="button">Başla</button></footer>
+  </section>
+
+  <section class="view step" aria-label="Adımlar">
+    <header class="bar">
+      <button class="back" id="back" type="button" aria-label="Geri"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6"/></svg></button>
+      <p class="count" id="count">Adım 1 / 10</p>
+      <span></span>
+    </header>
+    <div class="prog" aria-hidden="true"><i id="progFill"></i></div>
+
+    <div class="stage" aria-hidden="true">
+      <svg viewBox="0 0 360 223" xmlns="http://www.w3.org/2000/svg">
+        <image id="bike" href="img/motor.jpg" x="0" y="0" width="360" height="223"/>
+        <g class="cap-base">
+          <circle cx="57" cy="135" r="9.5" fill="var(--warn)" stroke="#FFFFFF" stroke-width="2"/>
+          <path d="M52.5 135l3 3l6-6" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <g class="fx fx-1">
+          <circle class="pulse" cx="57" cy="135" r="15" fill="none" stroke="var(--warn)" stroke-width="3"/>
+        </g>
+        <g class="fx fx-2">
+          <rect class="band" x="8" y="6" width="344" height="30" rx="15" fill="var(--water)" opacity=".3"/>
+          <g stroke="var(--water)" stroke-width="2.5" stroke-linecap="round">
+            <line class="drop" x1="80" y1="70" x2="80" y2="78"/><line class="drop" x1="130" y1="60" x2="130" y2="68" style="animation-delay:.2s"/>
+            <line class="drop" x1="176" y1="46" x2="176" y2="54" style="animation-delay:.5s"/><line class="drop" x1="232" y1="24" x2="232" y2="32" style="animation-delay:.1s"/>
+            <line class="drop" x1="312" y1="110" x2="312" y2="118" style="animation-delay:.35s"/><line class="drop" x1="150" y1="176" x2="150" y2="184" style="animation-delay:.6s"/>
+          </g>
+          <circle class="halo" cx="247" cy="42" r="13"/><circle class="ring" cx="247" cy="42" r="13"/><line class="slash" x1="237.9" y1="51.1" x2="256.1" y2="32.9"/>
+          <circle class="halo" cx="206" cy="48" r="11"/><circle class="ring" cx="206" cy="48" r="11"/><line class="slash" x1="198.3" y1="55.7" x2="213.7" y2="40.3"/>
+          <circle class="halo" cx="235" cy="102" r="14"/><circle class="ring" cx="235" cy="102" r="14"/><line class="slash" x1="225.2" y1="111.8" x2="244.8" y2="92.2"/>
+          <circle class="halo" cx="287" cy="161" r="16"/><circle class="ring" cx="287" cy="161" r="16"/><line class="slash" x1="275.8" y1="172.2" x2="298.2" y2="149.8"/>
+          <circle class="halo" cx="67" cy="164" r="16"/><circle class="ring" cx="67" cy="164" r="16"/><line class="slash" x1="55.8" y1="175.2" x2="78.2" y2="152.8"/>
+          <circle cx="16" cy="18" r="7" fill="none" stroke="var(--warn)" stroke-width="2.5"/><line x1="11" y1="23" x2="21" y2="13" stroke="var(--warn)" stroke-width="2.5" stroke-linecap="round"/>
+          <text class="cap" x="30" y="23">= yakından sıkma</text>
+        </g>
+        <g class="fx fx-3">
+          <circle class="iron" cx="287" cy="161" r="31"/>
+          <circle class="iron" cx="67" cy="164" r="30" style="animation-delay:1.2s"/>
+          <g class="brush"><rect x="284" y="114" width="6" height="32" rx="3" fill="var(--ink)" stroke="#FFFFFF" stroke-width="1.5"/><rect x="278" y="142" width="18" height="24" rx="6" fill="var(--mark)" stroke="#FFFFFF" stroke-width="1.5"/></g>
+          <circle cx="347" cy="150" r="11" fill="var(--ink)"/><text class="num" x="347" y="154.5" text-anchor="middle">1</text>
+          <circle cx="12" cy="150" r="11" fill="var(--ink)"/><text class="num" x="12" y="154.5" text-anchor="middle">2</text>
+        </g>
+        <g class="fx fx-4">
+          <path d="M132 16H180V28" fill="none" stroke="var(--metal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <line class="stream" x1="180" y1="34" x2="180" y2="58" stroke="var(--water)" stroke-width="5" stroke-dasharray="7 5"/>
+          <rect x="128" y="46" width="104" height="150" rx="14" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/>
+          <rect class="water-level" x="134" y="54" width="92" height="136" rx="9" fill="var(--water)" opacity=".8"/>
+          <text class="big" x="250" y="130">12 L</text>
+        </g>
+        <g class="fx fx-5"><circle class="blob" cx="67" cy="150" r="15" style="animation-delay:0.0s"/><circle class="blob" cx="46" cy="182" r="11" style="animation-delay:0.08s"/><circle class="blob" cx="92" cy="186" r="12" style="animation-delay:0.16s"/><circle class="blob" cx="287" cy="146" r="15" style="animation-delay:0.24s"/><circle class="blob" cx="266" cy="184" r="12" style="animation-delay:0.32s"/><circle class="blob" cx="308" cy="180" r="11" style="animation-delay:0.4s"/><circle class="blob" cx="180" cy="170" r="12" style="animation-delay:0.48s"/><circle class="blob" cx="140" cy="156" r="12" style="animation-delay:0.56s"/><circle class="blob" cx="205" cy="142" r="13" style="animation-delay:0.64s"/><circle class="blob" cx="162" cy="128" r="13" style="animation-delay:0.72s"/><circle class="blob" cx="236" cy="104" r="12" style="animation-delay:0.8s"/><circle class="blob" cx="60" cy="98" r="10" style="animation-delay:0.88s"/><circle class="blob" cx="100" cy="90" r="12" style="animation-delay:0.96s"/><circle class="blob" cx="135" cy="94" r="12" style="animation-delay:1.04s"/><circle class="blob" cx="185" cy="82" r="14" style="animation-delay:1.12s"/><circle class="blob" cx="215" cy="72" r="13" style="animation-delay:1.2s"/><circle class="blob" cx="250" cy="84" r="11" style="animation-delay:1.28s"/><circle class="blob" cx="292" cy="90" r="10" style="animation-delay:1.36s"/><circle class="blob" cx="262" cy="46" r="12" style="animation-delay:1.44s"/><circle class="blob" cx="206" cy="44" r="9" style="animation-delay:1.52s"/></g>
+        <g class="fx fx-6">
+          <g class="mitt"><rect x="-16" y="-11" width="32" height="22" rx="9" fill="var(--mark)" stroke="#FFFFFF" stroke-width="2"/><rect x="-23" y="-2" width="12" height="12" rx="6" fill="var(--mark)" stroke="#FFFFFF" stroke-width="2"/></g>
+          <circle cx="170" cy="50" r="11" fill="var(--ink)"/><text class="num" x="170" y="54.5" text-anchor="middle">1</text>
+          <circle cx="100" cy="66" r="11" fill="var(--ink)"/><text class="num" x="100" y="70.5" text-anchor="middle">2</text>
+          <circle cx="190" cy="170" r="11" fill="var(--ink)"/><text class="num" x="190" y="174.5" text-anchor="middle">3</text>
+        </g>
+        <g class="fx fx-7"><circle class="blob" cx="262" cy="46" r="12" style="animation-delay:0.38s"/><circle class="blob" cx="215" cy="72" r="13" style="animation-delay:0.77s"/><circle class="blob" cx="185" cy="82" r="14" style="animation-delay:0.92s"/><circle class="blob" cx="100" cy="90" r="12" style="animation-delay:1.04s"/><circle class="blob" cx="135" cy="94" r="12" style="animation-delay:1.1s"/><circle class="blob" cx="236" cy="104" r="12" style="animation-delay:1.25s"/><circle class="blob" cx="162" cy="128" r="13" style="animation-delay:1.62s"/><circle class="blob" cx="205" cy="142" r="13" style="animation-delay:1.83s"/><circle class="blob" cx="287" cy="146" r="15" style="animation-delay:1.89s"/><circle class="blob" cx="67" cy="150" r="15" style="animation-delay:1.95s"/><circle class="blob" cx="180" cy="170" r="12" style="animation-delay:2.25s"/><circle class="blob" cx="266" cy="184" r="12" style="animation-delay:2.46s"/><circle class="blob" cx="92" cy="186" r="12" style="animation-delay:2.49s"/>
+          <rect class="band" x="8" y="6" width="344" height="30" rx="15" fill="var(--water)" opacity=".3"/>
+        </g>
+        <g class="fx fx-8"><circle class="dropdot" cx="215" cy="70" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:0.3s"/><circle class="dropdot" cx="180" cy="84" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:0.6s"/><circle class="dropdot" cx="120" cy="92" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:1.6s"/><circle class="dropdot" cx="70" cy="96" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:2.0s"/><circle class="dropdot" cx="160" cy="130" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:3.4s"/><circle class="dropdot" cx="205" cy="146" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:3.9s"/><circle class="dropdot" cx="67" cy="140" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:5.2s"/><circle class="dropdot" cx="50" cy="170" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:5.6s"/><circle class="dropdot" cx="287" cy="138" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:7.0s"/><circle class="dropdot" cx="306" cy="170" r="3.5" stroke="#FFFFFF" stroke-width="1" style="animation-delay:7.3s"/>
+          <g class="cap-off"><circle cx="57" cy="135" r="9.5" fill="var(--warn)" stroke="#FFFFFF" stroke-width="2"/></g>
+          <g class="towel"><rect x="-28" y="-16" width="56" height="32" rx="6" fill="var(--surface)" stroke="var(--mark)" stroke-width="3"/><path d="M-18 -6H18M-18 4H18" stroke="var(--mark)" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/></g>
+        </g>
+        <g class="fx fx-9">
+          <ellipse class="hl" cx="98" cy="90" rx="56" ry="12" transform="rotate(6 98 90)"/>
+          <ellipse class="hl" cx="235" cy="102" rx="14" ry="18"/>
+          <ellipse class="hl" cx="274" cy="120" rx="32" ry="8" transform="rotate(-4 274 120)"/>
+          <ellipse class="hl" cx="38" cy="96" rx="22" ry="7"/>
+          <g class="cloth"><rect x="-11" y="-9" width="22" height="18" rx="4" fill="var(--surface)" stroke="var(--mark)" stroke-width="3"/></g>
+        </g>
+        <g class="fx fx-10">
+          <circle class="puff" cx="46" cy="134" r="5" fill="var(--metal)"/>
+          <circle class="puff" cx="46" cy="134" r="5" fill="var(--metal)" style="animation-delay:.55s"/>
+          <circle class="puff" cx="46" cy="134" r="5" fill="var(--metal)" style="animation-delay:1.1s"/>
+          <circle class="halo" cx="67" cy="164" r="16"/><circle class="pulse" cx="67" cy="164" r="16" fill="none" stroke="var(--ok)" stroke-width="4"/>
+          <circle class="halo" cx="287" cy="161" r="18"/><circle class="pulse" cx="287" cy="161" r="18" fill="none" stroke="var(--ok)" stroke-width="4"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="body" id="body">
+      <h1 id="title"></h1>
+      <div class="use" id="use"></div>
+      <ol class="todo" id="todo"></ol>
+      <button class="timer" id="timer" type="button" hidden></button>
+      <p class="warn" id="warn"></p>
+    </div>
+    <footer class="foot"><button class="go" id="next" type="button">Tamam, sonraki</button></footer>
+  </section>
+</div>
+
+<script>
+var ITEMS = {
+  karcher:{s:"Kärcher", n:"Kärcher KMB 6‑18", icon:"i-washer"},
+  lans:{s:"Lans + nozul", n:"Lans + yelpaze nozul", icon:"i-lance"},
+  kopuk:{s:"Köpük nozulu", n:"Kärcher köpük nozulu", icon:"i-foam"},
+  aku:{s:"Yedek akü", n:"Yedek akü, 18 V", icon:"i-battery"},
+  nxt:{s:"NXT şampuan", n:"Meguiar's NXT Car Wash", icon:"i-jug"},
+  iron:{s:"WheelCleaner", n:"Gyeon Iron WheelCleaner", icon:"i-spray-wheel"},
+  trim:{s:"Trim Cleaner", n:"Gyeon Trim Cleaner", icon:"i-spray-trim"},
+  jantfirca:{s:"Jant fırçası", n:"Smartbee jant fırçası", icon:"i-wheelbrush"},
+  lastikfirca:{s:"Lastik fırçası", n:"Gyeon lastik fırçası", icon:"i-handbrush"},
+  bez:{s:"Bez", n:"CarPro mikrofiber bez, 3 adet", icon:"i-cloth"},
+  eldiven:{s:"Eldiven", n:"Yıkama eldiveni", icon:"i-mitt"},
+  havlu:{s:"Havlu", n:"Kurulama havlusu", icon:"i-towel"},
+  kova:{s:"Kova", n:"Kova, 10 L", icon:"i-bucket", buy:true},
+  poset:{s:"Poşet", n:"Poşet + lastik", icon:"i-bag", buy:true}
+};
+var ORDER = ["karcher","lans","kopuk","aku","nxt","iron","trim","jantfirca","lastikfirca","bez","eldiven","havlu","kova","poset"];
+var STEPS = [
+  { t:"Hazırlık", use:["kova","nxt","poset"],
+    d:["Motoru gölgeye çek. Egzoz elle tutulacak kadar soğusun.",
+       "Egzoz ucunu poşetle kapat.",
+       "Kovaya 10 L su ve 80 ml şampuan koy."],
+    w:"Sıcak motoru yıkama. Leke kalır." },
+  { t:"Ön durulama", use:["karcher","lans"],
+    d:["Yelpaze nozulu tak.",
+       "30 ile 50 cm uzaktan, yukarıdan aşağı ıslat.",
+       "Çamurluk içlerini ve motorun altını da ıslat."],
+    w:"Yakından sıkma: ekran, düğmeler, radyatör, frenler, şaft körüğü, çıkartmalar." },
+  { t:"Jant ve lastik", use:["iron","jantfirca","lastikfirca"],
+    d:["Ön janta Iron WheelCleaner sık. 2 dakika bekle.",
+       "Jantı ve telleri fırçala. Lastiği lastik fırçasıyla fırçala.",
+       "Bol suyla durula. Aynısını arka jantta yap."],
+    timer:120, td:"Süre doldu. Fırçala ve durula.",
+    w:"Tek seferde tek jant. Ürün jantta kurumasın." },
+  { t:"Depoyu doldur", use:["karcher","aku"],
+    d:["Musluğa git. Depoyu ağzına kadar doldur.",
+       "Aküye bak. Azaldıysa yedeğini tak."],
+    w:"Bu adımı atlarsan durulamanın ortasında su biter." },
+  { t:"Köpük", use:["kopuk","nxt"],
+    d:["Hazneye 40 ml şampuan koy, suyla tamamla.",
+       "Tüm motoru köpükle kapla.",
+       "3 dakika bekle."],
+    timer:180, td:"Süre doldu. Elle yıkamaya geç.",
+    w:"Köpük kurumaya başlarsa beklemeden devam et." },
+  { t:"Elle yıkama", use:["eldiven","kova"],
+    d:["Eldiveni kovaya batır.",
+       "Yukarıdan aşağı sil: önce depo ve ön cam, sonra sele, en son silindirler ve alt kısım.",
+       "Her bölgeden sonra eldiveni kovada çalkala."],
+    w:"Bastırma. Mat yüzeyleri ovma." },
+  { t:"Son durulama", use:["karcher","lans"],
+    d:["Yelpaze nozula geç.",
+       "Yukarıdan aşağı, köpük kalmayana kadar durula.",
+       "Radyatörü uzaktan, hafif suyla durula."],
+    w:"Yakından sıkma: ekran, düğmeler, radyatör, frenler, şaft körüğü, çıkartmalar." },
+  { t:"Kurulama", use:["havlu","bez"],
+    d:["Havluyu yüzeye yatır, sürtmeden çek.",
+       "Girintileri ve jant tellerini küçük bezle kurula.",
+       "Egzoz poşetini çıkar."],
+    w:"Güneşte kurumaya bırakma. Su lekesi kalır." },
+  { t:"Plastik ve sele", use:["trim","bez"],
+    d:["Trim Cleaner'ı beze sık.",
+       "Boyasız siyah plastikleri ve seleyi sil.",
+       "Kuru bezle fazlasını al."],
+    w:"Ön cama ve ekrana sürme. Seleye ve lastiğe parlatıcı sürme." },
+  { t:"Son kontrol", use:["bez"],
+    d:["Egzoz poşeti çıktı mı? Kontrol et.",
+       "Motoru çalıştır. 3 dakika rölantide beklet.",
+       "İlk sürüşte frenleri birkaç kez hafifçe sık."],
+    timer:180, td:"Yeterli. Motoru kapatabilirsin.",
+    w:"Islak fren geç tutar. İlk metrelerde dikkatli ol." }
+];
+
+var app = document.getElementById("app");
+var el = function(id){ return document.getElementById(id); };
+var NS = "http://www.w3.org/2000/svg";
+var i = 0, view = "list", tick = null, endAt = 0, tState = "idle", actx = null, checked = {};
+
+try {
+  var saved = JSON.parse(localStorage.getItem("yikama-v2") || "{}") || {};
+  if (saved.i >= 0 && saved.i < STEPS.length) i = saved.i;
+  if (saved.view === "step") view = "step";
+  if (saved.checked) checked = saved.checked;
+} catch (e) {}
+function save(){ try { localStorage.setItem("yikama-v2", JSON.stringify({i:i, view:view, checked:checked})); } catch (e) {} }
+
+function useIcon(id){
+  var s = document.createElementNS(NS, "svg"), u = document.createElementNS(NS, "use");
+  s.setAttribute("viewBox", id === "i-check" ? "0 0 16 16" : "0 0 64 64"); s.setAttribute("aria-hidden", "true");
+  u.setAttribute("href", "#" + id); s.appendChild(u); return s;
+}
+function tile(key, asButton){
+  var it = ITEMS[key], t = document.createElement(asButton ? "button" : "div"), pic = document.createElement("span"), name = document.createElement("span");
+  t.className = "tile"; pic.className = "pic";
+  if (it.img) { var im = document.createElement("img"); im.src = it.img; im.alt = ""; im.loading = "lazy"; pic.appendChild(im); }
+  else pic.appendChild(useIcon(it.icon));
+  if (asButton) {
+    if (it.buy) { var b = document.createElement("span"); b.className = "buy"; b.textContent = "alınacak"; pic.appendChild(b); }
+    var tk = document.createElement("span"); tk.className = "tick"; tk.appendChild(useIcon("i-check")); pic.appendChild(tk);
+    t.type = "button"; t.setAttribute("aria-pressed", checked[key] ? "true" : "false");
+    t.addEventListener("click", function(){ checked[key] = !checked[key]; t.setAttribute("aria-pressed", checked[key] ? "true" : "false"); save(); });
+  }
+  name.textContent = asButton ? it.n : (it.s || it.n); t.appendChild(pic); t.appendChild(name); return t;
+}
+ORDER.forEach(function(k){ el("grid").appendChild(tile(k, true)); });
+
+function fmt(sec){ var m = Math.floor(sec / 60), r = sec % 60; return (m < 10 ? "0" : "") + m + ":" + (r < 10 ? "0" : "") + r; }
+function resetTimer(){
+  clearInterval(tick); tick = null; tState = "idle";
+  var st = STEPS[i], b = el("timer");
+  b.className = "timer"; b.hidden = !st.timer;
+  if (st.timer) b.textContent = (st.timer / 60) + " dakikalık sayacı başlat";
+}
+function beep(){
+  try {
+    if (!actx) return;
+    [0, .35, .7].forEach(function(o){
+      var osc = actx.createOscillator(), g = actx.createGain();
+      osc.frequency.value = 880; g.gain.value = .15; osc.connect(g); g.connect(actx.destination);
+      osc.start(actx.currentTime + o); osc.stop(actx.currentTime + o + .2);
+    });
+  } catch (e) {}
+}
+el("timer").addEventListener("click", function(){
+  var st = STEPS[i], b = el("timer");
+  if (tState === "run") { resetTimer(); return; }
+  try { var AC = window.AudioContext || window.webkitAudioContext; if (AC) { actx = actx || new AC(); if (actx.resume) actx.resume(); } } catch (e) { actx = null; }
+  tState = "run"; endAt = Date.now() + st.timer * 1000;
+  b.className = "timer run"; b.textContent = fmt(st.timer) + " · durdurmak için dokun";
+  tick = setInterval(function(){
+    var left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+    if (left <= 0) { clearInterval(tick); tick = null; tState = "done"; b.className = "timer over"; b.textContent = st.td; beep(); }
+    else b.textContent = fmt(left) + " · durdurmak için dokun";
+  }, 250);
+});
+
+function render(){
+  var st = STEPS[i];
+  app.setAttribute("data-view", view);
+  app.setAttribute("data-step", String(i + 1));
+  el("count").textContent = "Adım " + (i + 1) + " / " + STEPS.length;
+  el("progFill").style.width = ((i + 1) / STEPS.length * 100) + "%";
+  el("title").textContent = st.t;
+  var u = el("use"); u.textContent = ""; st.use.forEach(function(k){ u.appendChild(tile(k, false)); });
+  var ol = el("todo"); ol.textContent = "";
+  st.d.forEach(function(x){ var li = document.createElement("li"), sp = document.createElement("span"); sp.textContent = x; li.appendChild(sp); ol.appendChild(li); });
+  el("warn").textContent = st.w;
+  el("next").textContent = i === STEPS.length - 1 ? "Bitti" : "Tamam, sonraki";
+  resetTimer();
+  el("body").scrollTop = 0;
+  save();
+}
+function forward(){ if (i === STEPS.length - 1) { i = 0; view = "list"; } else i++; render(); }
+function backward(){ if (i === 0) view = "list"; else i--; render(); }
+el("start").addEventListener("click", function(){ view = "step"; render(); });
+el("next").addEventListener("click", forward);
+el("back").addEventListener("click", backward);
+document.addEventListener("keydown", function(e){
+  if (view !== "step") return;
+  if (e.key === "ArrowRight") forward();
+  if (e.key === "ArrowLeft") backward();
+});
+render();
+if ("serviceWorker" in navigator) { window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+</script>
+</body>
+</html>
