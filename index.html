@@ -82,10 +82,11 @@ h1{margin:0;font:italic 700 38px/1 var(--display);text-wrap:balance}
 .prog i{display:block;height:100%;width:10%;border-radius:3px;background:var(--water);transition:width .3s ease}
 .stage{margin:0 16px;background:#F3EFE8;border-radius:14px;overflow:hidden;flex-shrink:0;
   --ink:#131C36;--surface:#FFFFFF;--line:#D9D2C6;--water:#1B5CD6;--water-soft:#D6E3FA;--warn:#B84A0E;--iron:#8A3FC8;--ok:#128A63;--foam:#FFFFFF;--metal:#8793A8;--mark:#0A9A96}
-.stage svg{display:block;width:100%;height:auto;max-height:205px}
-@media (max-height:760px){.stage svg{max-height:150px}}
+.stage svg{display:block;width:100%;height:auto;max-height:190px}
 .body{flex:1;min-height:0;overflow-y:auto;padding:12px 16px 6px;display:flex;flex-direction:column;gap:12px}
 .body h1{font-size:34px}
+.why{margin:-4px 0 0;font:500 16px/1.35 var(--body);color:var(--muted)}
+.why b{font-weight:600;color:var(--ink)}
 .use{display:flex;gap:10px}
 .use .tile{width:80px;font-size:12px;overflow-wrap:anywhere}
 .todo{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:n;font:500 18px/1.3 var(--body)}
@@ -159,6 +160,7 @@ h1{margin:0;font:italic 700 38px/1 var(--display);text-wrap:balance}
 @keyframes polish{from{transform:translate(66px,88px)}to{transform:translate(140px,94px)}}
 @keyframes puff{from{transform:translate(0,0) scale(.6);opacity:.7}to{transform:translate(-26px,-10px) scale(2);opacity:0}}
 @keyframes idle{to{transform:translateY(.8px)}}
+@media (max-height:800px){.stage svg{max-height:135px}.body{gap:10px}.body h1{font-size:30px}.todo{font-size:17px}.why{font-size:15px}.warn{font-size:15px}.use .tile{width:68px}.timer{padding:10px 12px}}
 </style>
 </head>
 <body>
@@ -271,6 +273,7 @@ h1{margin:0;font:italic 700 38px/1 var(--display);text-wrap:balance}
 
     <div class="body" id="body">
       <h1 id="title"></h1>
+      <p class="why" id="why"></p>
       <div class="use" id="use"></div>
       <ol class="todo" id="todo"></ol>
       <button class="timer" id="timer" type="button" hidden></button>
@@ -287,7 +290,7 @@ var ITEMS = {
   kopuk:{s:"Köpük nozulu", n:"Kärcher köpük nozulu", icon:"i-foam"},
   aku:{s:"Yedek akü", n:"Yedek akü, 18 V", icon:"i-battery"},
   nxt:{s:"NXT şampuan", n:"Meguiar's NXT Car Wash", icon:"i-jug"},
-  iron:{s:"WheelCleaner", n:"Gyeon Iron WheelCleaner", icon:"i-spray-wheel"},
+  iron:{s:"Jant spreyi", n:"Gyeon Iron WheelCleaner", icon:"i-spray-wheel"},
   trim:{s:"Trim Cleaner", n:"Gyeon Trim Cleaner", icon:"i-spray-trim"},
   jantfirca:{s:"Jant fırçası", n:"Smartbee jant fırçası", icon:"i-wheelbrush"},
   lastikfirca:{s:"Lastik fırçası", n:"Gyeon lastik fırçası", icon:"i-handbrush"},
@@ -299,59 +302,59 @@ var ITEMS = {
 };
 var ORDER = ["karcher","lans","kopuk","aku","nxt","iron","trim","jantfirca","lastikfirca","bez","eldiven","havlu","kova","poset"];
 var STEPS = [
-  { t:"Hazırlık", use:["poset","karcher"],
+  { t:"Hazırlık", y:"Sıcak motorda su ve şampuan leke yapar. Açık egzoza su girer.", use:["poset","karcher"],
     d:["Motoru gölgeye çek. Egzoz elle tutulacak kadar soğusun.",
        "Egzoz ucunu poşetle kapat.",
        "Kärcher'in deposunu doldur, aküyü tak."],
-    w:"Sıcak motoru yıkama. Leke kalır." },
-  { t:"Ön durulama", use:["karcher","lans"],
+    w:"Egzoz hâlâ sıcaksa bekle. Acele etme." },
+  { t:"Ön durulama", y:"Kumu ve tozu elini sürmeden akıtmak için. Çizik burada önlenir.", use:["karcher","lans"],
     d:["Yelpaze nozulu tak.",
        "30 ile 50 cm uzaktan, yukarıdan aşağı ıslat.",
        "Çamurluk içlerini ve motorun altını da ıslat."],
     w:"Yakından sıkma: ekran, düğmeler, radyatör, frenler, şaft körüğü, çıkartmalar." },
-  { t:"Jant ve lastik", use:["iron","jantfirca","lastikfirca"],
+  { t:"Jant ve lastik", y:"Jantlar en kirli yer. Önce temizlenirse pislik boyaya sıçramaz.", use:["iron","jantfirca","lastikfirca"],
     d:["Ön janta Iron WheelCleaner sık. 2 dakika bekle.",
-       "Jantı ve telleri fırçala. Lastiği lastik fırçasıyla fırçala.",
+       "Jantı, telleri ve lastiği fırçala.",
        "Bol suyla durula. Aynısını arka jantta yap."],
     timer:120, td:"Süre doldu. Fırçala ve durula.",
     w:"Tek seferde tek jant. Ürün jantta kurumasın." },
-  { t:"Su ve şampuan", use:["karcher","kova","kopuk","nxt"],
+  { t:"Su ve şampuan", y:"Köpükten sonra ara veremezsin. Her şey şimdiden hazır olmalı.", use:["karcher","kova","kopuk","nxt"],
     d:["Musluğa git. Depoyu ağzına kadar doldur.",
        "Kova: 10 L su ve 80 ml şampuan. Elle yıkama için.",
        "Köpük haznesi: 40 ml şampuan, üstünü suyla tamamla. Köpük için."],
     w:"Bu adımı atlarsan durulamanın ortasında su biter." },
-  { t:"Köpük", use:["kopuk","karcher"],
+  { t:"Köpük", y:"Köpük kiri dokunmadan yumuşatır. Elle yıkarken çizik riski azalır.", use:["kopuk","karcher"],
     d:["Köpük nozulunu tak.",
-       "Tüm motoru köpükle kapla. Amaç kiri dokunmadan yumuşatmak.",
+       "Tüm motoru köpükle kapla.",
        "3 dakika bekle."],
     timer:180, td:"Süre doldu. Elle yıkamaya geç.",
     w:"Köpük kurumaya başlarsa beklemeden devam et." },
-  { t:"Elle yıkama", use:["eldiven","kova"],
+  { t:"Elle yıkama", y:"Köpüğün yumuşattığı kiri yüzeyden almak için. Asıl temizlik bu adımda olur.", use:["eldiven","kova"],
     d:["Eldiveni 4. adımda hazırladığın şampuanlı kovaya batır.",
        "Yukarıdan aşağı sil: önce depo ve ön cam, sonra sele, en son silindirler ve alt kısım.",
        "Her bölgeden sonra eldiveni kovada çalkala."],
     w:"Bastırma. Mat yüzeyleri ovma." },
-  { t:"Son durulama", use:["karcher","lans"],
+  { t:"Son durulama", y:"Şampuanı ve çözülen kiri tamamen akıtmak için. Kalan şampuan leke yapar.", use:["karcher","lans"],
     d:["Yelpaze nozula geç.",
        "Yukarıdan aşağı, köpük kalmayana kadar durula.",
        "Radyatörü uzaktan, hafif suyla durula."],
     w:"Yakından sıkma: ekran, düğmeler, radyatör, frenler, şaft körüğü, çıkartmalar." },
-  { t:"Kurulama", use:["havlu","bez"],
+  { t:"Kurulama", y:"Kendi kendine kuruyan su damlaları leke bırakır.", use:["havlu","bez"],
     d:["Havluyu yüzeye yatır, sürtmeden çek.",
        "Girintileri ve jant tellerini küçük bezle kurula.",
        "Egzoz poşetini çıkar."],
-    w:"Güneşte kurumaya bırakma. Su lekesi kalır." },
-  { t:"Plastik ve sele", use:["trim","bez"],
+    w:"Jant bezini boyada kullanma. Kum taşır, çizer." },
+  { t:"Plastik ve sele", y:"Şampuan boyasız plastikteki izleri almaz. Bu ürün mat ve temiz bırakır.", use:["trim","bez"],
     d:["Trim Cleaner'ı beze sık.",
        "Boyasız siyah plastikleri ve seleyi sil.",
        "Kuru bezle fazlasını al."],
     w:"Ön cama ve ekrana sürme. Seleye ve lastiğe parlatıcı sürme." },
-  { t:"Son kontrol", use:["bez"],
+  { t:"Son kontrol", y:"Poşet egzozda kalmamalı, frenler kurumalı.", use:["bez"],
     d:["Egzoz poşeti çıktı mı? Kontrol et.",
        "Motoru çalıştır. 3 dakika rölantide beklet.",
        "İlk sürüşte frenleri birkaç kez hafifçe sık."],
     timer:180, td:"Yeterli. Motoru kapatabilirsin.",
-    w:"Islak fren geç tutar. İlk metrelerde dikkatli ol." }
+    w:"Islak fren geç tutar. Yavaş başla." }
 ];
 
 var app = document.getElementById("app");
@@ -424,6 +427,7 @@ function render(){
   el("count").textContent = "Adım " + (i + 1) + " / " + STEPS.length;
   el("progFill").style.width = ((i + 1) / STEPS.length * 100) + "%";
   el("title").textContent = st.t;
+  var wy = el("why"); wy.textContent = ""; var wb = document.createElement("b"); wb.textContent = "Neden: "; wy.appendChild(wb); wy.appendChild(document.createTextNode(st.y));
   var u = el("use"); u.textContent = ""; st.use.forEach(function(k){ u.appendChild(tile(k, false)); });
   var ol = el("todo"); ol.textContent = "";
   st.d.forEach(function(x){ var li = document.createElement("li"), sp = document.createElement("span"); sp.textContent = x; li.appendChild(sp); ol.appendChild(li); });
