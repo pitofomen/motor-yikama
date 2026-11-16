@@ -299,10 +299,10 @@ var ITEMS = {
 };
 var ORDER = ["karcher","lans","kopuk","aku","nxt","iron","trim","jantfirca","lastikfirca","bez","eldiven","havlu","kova","poset"];
 var STEPS = [
-  { t:"Hazırlık", use:["kova","nxt","poset"],
+  { t:"Hazırlık", use:["poset","karcher"],
     d:["Motoru gölgeye çek. Egzoz elle tutulacak kadar soğusun.",
        "Egzoz ucunu poşetle kapat.",
-       "Kovaya 10 L su ve 80 ml şampuan koy."],
+       "Kärcher'in deposunu doldur, aküyü tak."],
     w:"Sıcak motoru yıkama. Leke kalır." },
   { t:"Ön durulama", use:["karcher","lans"],
     d:["Yelpaze nozulu tak.",
@@ -315,8 +315,9 @@ var STEPS = [
        "Bol suyla durula. Aynısını arka jantta yap."],
     timer:120, td:"Süre doldu. Fırçala ve durula.",
     w:"Tek seferde tek jant. Ürün jantta kurumasın." },
-  { t:"Depoyu doldur", use:["karcher","aku"],
+  { t:"Depo ve kova", use:["karcher","kova","nxt"],
     d:["Musluğa git. Depoyu ağzına kadar doldur.",
+       "Kovaya 10 L su ve 80 ml şampuan koy. Köpükten hemen sonra lazım olacak.",
        "Aküye bak. Azaldıysa yedeğini tak."],
     w:"Bu adımı atlarsan durulamanın ortasında su biter." },
   { t:"Köpük", use:["kopuk","nxt"],
@@ -326,7 +327,7 @@ var STEPS = [
     timer:180, td:"Süre doldu. Elle yıkamaya geç.",
     w:"Köpük kurumaya başlarsa beklemeden devam et." },
   { t:"Elle yıkama", use:["eldiven","kova"],
-    d:["Eldiveni kovaya batır.",
+    d:["Eldiveni 4. adımda hazırladığın şampuanlı kovaya batır.",
        "Yukarıdan aşağı sil: önce depo ve ön cam, sonra sele, en son silindirler ve alt kısım.",
        "Her bölgeden sonra eldiveni kovada çalkala."],
     w:"Bastırma. Mat yüzeyleri ovma." },
